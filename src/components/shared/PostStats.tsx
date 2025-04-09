@@ -21,6 +21,7 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
 
   const [likes, setLikes] = useState<string[]>(likesList);
   const [isSaved, setIsSaved] = useState(false);
+  const [savedPostRecord, setSavedPostRecord] = useState<Models.Document | null>(null);
 
   const { mutate: likePost } = useLikePost();
   const { mutate: savePost } = useSavePost();
@@ -28,13 +29,16 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
 
   const { data: currentUser } = useGetCurrentUser();
 
-  const savedPostRecord = currentUser?.save.find(
-    (record: Models.Document) => record.post.$id === post.$id
-  );
-
   useEffect(() => {
-    setIsSaved(!!savedPostRecord);
-  }, [currentUser]);
+    if (!currentUser || !Array.isArray(currentUser.save)) return;
+
+    const foundRecord = currentUser.save.find(
+      (record: Models.Document) => record?.post?.$id === post.$id
+    );
+
+    setSavedPostRecord(foundRecord || null);
+    setIsSaved(!!foundRecord);
+  }, [currentUser, post.$id]);
 
   const handleLikePost = (
     e: React.MouseEvent<HTMLImageElement, MouseEvent>
@@ -93,7 +97,7 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
       <div className="flex gap-2">
         <img
           src={isSaved ? "/assets/icons/saved.svg" : "/assets/icons/save.svg"}
-          alt="share"
+          alt="save"
           width={20}
           height={20}
           className="cursor-pointer"
