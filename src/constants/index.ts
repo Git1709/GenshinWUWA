@@ -54,7 +54,7 @@ export const sidebarLinks = [
     },
     {
         label: "YouTube",
-        route: "/youtube",
+        route: "https://youtube.com",
         imgURL: "/assets/icons/youtube.svg", // Make sure this file exists
       },
     {
